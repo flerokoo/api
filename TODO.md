@@ -19,3 +19,4 @@
 - [ ] TESTS (Load testing) (Unit testing)
 - [ ] Validation schemas
 - [ ] Introspection
+- [ ] Move types to separate files

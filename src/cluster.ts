@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import dotenv from 'dotenv-safe';
 import { gracefulShutdownHandler } from './utils/graceful-shutdown.js';
 import { logger } from './utils/logger.js';
 import cluster, { Worker } from 'cluster';
@@ -7,8 +6,6 @@ import config from './config.js';
 import { delay } from './utils/delay.js';
 import { Readable } from 'node:stream';
 import path from 'node:path';
-
-dotenv.config();
 
 cluster.setupPrimary({
   exec: path.join('./build/worker.js'),
@@ -42,7 +39,7 @@ const startWorker = (id: number) => {
   logger.info(`started worker ${id}, pid=${worker.process.pid}`);
 };
 
-for (let i = 0; i < config.workers; i++) {
+for (let i = 0; i < config.cluster.workers; i++) {
   startWorker(i);
 }
 

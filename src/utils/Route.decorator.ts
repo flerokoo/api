@@ -22,10 +22,20 @@ export type RouteDefinition = {
 
 function Route(method: HttpMethod, path: string, params?: RouteParams) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
-  return function (target: object, propertyKey: string, descriptor: TypedPropertyDescriptor<any>) {
-    Reflect.defineMetadata(ROUTE_META_KEY, { method, path, propertyKey, params }, target, propertyKey);
+  return function (
+    target: object,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<any>
+  ) {
+    Reflect.defineMetadata(
+      ROUTE_META_KEY,
+      { method, path, propertyKey, params },
+      target,
+      propertyKey
+    );
 
-    const original: (req: Request, res: Response, next: () => void) => void = descriptor.value;
+    const original: (req: Request, res: Response, next: () => void) => void =
+      descriptor.value;
 
     descriptor.value = async function (req: Request, res: Response, next: () => void) {
       const tasks: [keyof Request, ZodTypeAny | undefined][] = [

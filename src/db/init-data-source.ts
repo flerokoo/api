@@ -6,7 +6,7 @@ import { logger } from '../utils/logger.js';
 
 export async function initDataSource(gracefulShutdownHandler: IGracefulShutdownHandler): Promise<DataSource> {
   const ds = new DataSource({
-    type: config.dbDriver,
+    type: config.database.driver as ('sqlite' | 'postgres'),
     database: process.env.DATABASE as string,
     entities: ['./build/db/models/*'],
     synchronize: !isProduction()

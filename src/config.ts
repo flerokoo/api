@@ -1,15 +1,26 @@
 const config = Object.freeze({
-  // http(s)
-  https: false,
-  certPath: 'creds/cert.pem',
-  keyPath: 'creds/key.pem',
+
+  http: {
+    enabled: true,
+    port: 80
+  },
+
+  https: {
+    enabled: true,
+    port: 443,
+    certPath: 'creds/cert.pem',
+    keyPath: 'creds/key.pem'  
+  },
 
   // database
-  dbDriver: 'sqlite',
+  database: {
+    driver: 'sqlite'
+  },
 
-  // cluster
-  useCluster: false,
-  workers: 3,
+  cluster: {
+    enabled: false,
+    workers: 3
+  },
 
   //other
   logDir: 'logs/',

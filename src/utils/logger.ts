@@ -13,8 +13,15 @@ const transports = cluster.isPrimary
       new winston.transports.File({ filename: logPath('log.log') })
     ]
   : [
-      new winston.transports.Stream({ stream: process.stdout, format: format.printf((_) => _.message) })
-      // new winston.transports.Stream({ stream: process.stderr, level: 'error' })
+      new winston.transports.Stream({
+        stream: process.stdout,
+        format: format.printf((_) => _.message)
+      }),
+      new winston.transports.Stream({
+        stream: process.stderr,
+        level: 'error',
+        format: format.printf((_) => _.message)
+      })
     ];
 
 const winstonLogger = winston.createLogger({
