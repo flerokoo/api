@@ -1,0 +1,21 @@
+# TODO
+
+- [x] Remove HttpError usage from domain logic
+- [ ] Remove (typeorm) DeepPartial/FindOptionsWhere usage in repo interfaces
+- [x] Rework currency handling to something better and safer
+- [ ] Add GraphQL endpoints
+- [ ] Add Websocket support
+- [x] Define routes with Decorator
+- [ ] Cluster
+- [x] Logging
+- [x] Graceful shutdown
+- [x] Graceful shutdown middleware
+- [ ] HTTPS
+- [x] Remove Bind decorator from Routes
+- [ ] Async Concurrent Queue
+- [ ] Rate limit
+- [ ] Dockerfile
+- [ ] github workflow
+- [ ] TESTS (Load testing) (Unit testing)
+- [ ] Validation schemas
+- [ ] Introspection
