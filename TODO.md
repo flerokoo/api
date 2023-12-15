@@ -18,5 +18,5 @@
 - [ ] github workflow
 - [ ] TESTS (Load testing) (Unit testing)
 - [ ] Validation schemas
-- [ ] Introspection
+- [x] Introspection
 - [ ] Move types to separate files

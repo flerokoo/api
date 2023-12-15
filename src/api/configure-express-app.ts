@@ -12,6 +12,7 @@ import { createGracefulShutdownMiddleware } from './middlewares/graceful-shutdow
 import { logMiddleware } from './middlewares/log.js';
 import { IController } from './controllers/index.js';
 import { JwtTokenValidator } from '../utils/jwt-validator.js';
+import { createIntrospectRoute } from './routes/create-introspect-route.js';
 
 export function configureExpress(
   app: express.Application,
@@ -30,4 +31,5 @@ export function configureExpress(
   app.use(createAuthenticatorMiddlware(jwtValidator));
   createRoutes(app, controllers);
   app.use(errorHandler); // handle sync errors
+  createIntrospectRoute(app, controllers);
 }
