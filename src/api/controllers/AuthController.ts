@@ -1,17 +1,16 @@
-import { Request, Response } from 'express';
 import { AuthService } from '../../services/AuthService.js';
 import { ApiDependencies } from '../server.js';
-import { success } from '../../utils/success.js';
 import { z } from 'zod';
-import { Get, Post } from '../../utils/Route.decorator.js';
-import { delay } from '../../utils/delay.js';
-export const AUTH_COOKIE_NAME = 'TOKEN';
+import { Post, Prefix } from '../../utils/Route.decorator.js';
+import { IRequest } from '../../utils/Request.js';
+
 
 const credentialsSchema = z.object({
   email: z.string().email(),
   password: z.string().min(5)
 });
 
+@Prefix('/v1/auth')
 export class AuthController {
   service: AuthService;
 
@@ -20,22 +19,17 @@ export class AuthController {
   }
 
   @Post('/register', { bodySchema: credentialsSchema })
-  async register(req: Request, res: Response) {
-    const { email, password } = req.body;
+  async register(request : IRequest) {
+    const { email, password } = request.body;
     const token = await this.service.register(email, password);
-    res.json(success({ token }));
+    request.reply({ token });
   }
 
   @Post('/login', { bodySchema: credentialsSchema })
-  async login(req: Request, res: Response) {
-    const { email, password } = req.body;
+  async login(request: IRequest) {
+    const { email, password } = request.body;
     const token = await this.service.login(email, password);
-    res.json(success({ token }));
+    request.reply({ token });
   }
 
-  @Get('/timeout')
-  async timeout(req: Request, res: Response) {
-    await delay(20);
-    res.end();
-  }
 }

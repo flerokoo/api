@@ -1,20 +1,13 @@
-import { ApiDependencies } from '../server.js';
-import { AuthController } from '../controllers/AuthController.js';
-import { SpendController } from '../controllers/SpendController.js';
-import { CategoryController } from '../controllers/CategoryController.js';
+import { IController } from '../controllers/index.js';
 import { createRouterFromMetadata } from './create-router-from-metadata.js';
 import type express from 'express';
 
-const controllers = {
-  '/v1/auth': AuthController,
-  '/v1/spends': SpendController,
-  '/v1/categories': CategoryController
-};
-
-export function createRoutes(app: express.Application, dependecies: ApiDependencies) {
-  for (const [pathPrefix, constr] of Object.entries(controllers)) {
-    const controller = new constr(dependecies);
+export function createRoutes(
+  app: express.Application,
+  controllers: IController[]
+) {
+  for (const controller of controllers) {
     const router = createRouterFromMetadata(controller);
-    app.use(pathPrefix, router);
+    app.use(router);
   }
 }

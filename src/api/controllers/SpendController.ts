@@ -1,11 +1,10 @@
-import { Request, Response } from 'express';
 import { ApiDependencies } from '../server.js';
-import { success } from '../../utils/success.js';
 import { SpendService } from '../../services/SpendService.js';
 import { getCurrentUser } from '../request-context.js';
 import { z } from 'zod';
 import { CurrencyList } from '../../utils/currencies.js';
-import { Delete, Get, Post } from '../../utils/Route.decorator.js';
+import { Delete, Get, Post, Prefix } from '../../utils/Route.decorator.js';
+import { IRequest } from '../../utils/Request.js';
 
 const spendCategorySchema = z.object({
   id: z.number().optional(),
@@ -20,6 +19,7 @@ const addSpendSchema = z.object({
   categories: z.array(spendCategorySchema)
 });
 
+@Prefix('/v1/spends')
 export class SpendController {
   service: SpendService;
   constructor({ SpendService }: ApiDependencies) {
@@ -27,22 +27,22 @@ export class SpendController {
   }
 
   @Post('/add', { checkAuth: true, bodySchema: addSpendSchema })
-  async addSpend(req: Request, res: Response) {
-    const { amount, currency, date, categories, description } = req.body;
+  async addSpend(request : IRequest) {
+    const { amount, currency, date, categories, description } = request.body;
     const user = getCurrentUser();
     await this.service.addSpend(description, amount, currency, user, new Date(date), categories);
-    res.json(success());
+    request.reply();
   }
 
   @Delete('/delete', { checkAuth: true })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async deleteSpend(req: Request, res: Response) {}
+  async deleteSpend(request : IRequest) {}
 
   @Get('/list', { checkAuth: true })
-  async listSpends(req: Request, res: Response) {
+  async listSpends(request : IRequest) {
     const user = getCurrentUser();
-    const { limit, offset } = req.body;
+    const { limit, offset } = request.body;
     const spends = await this.service.listSpends(user, limit, offset);
-    res.json(success({ spends }));
+    request.reply({ spends });
   }
 }

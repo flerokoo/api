@@ -4,9 +4,10 @@ import { AuthenticationError, AuthorizationError } from '../../utils/errors.js';
 import { ApplicationServices } from '../../services/init-services.js';
 import { handleError } from '../server.js';
 import { hasCurrentUser, setCurrentUser } from '../request-context.js';
+import { JwtTokenValidator } from '../../utils/jwt-validator.js';
 
-export const createAuthenticator =
-  ({ AuthService }: ApplicationServices) =>
+export const createAuthenticatorMiddlware =
+  (validateToken: JwtTokenValidator) =>
   (req: Request, res: Response, next: () => void) => {
     const token = req.header('Authorization');
 
@@ -16,7 +17,7 @@ export const createAuthenticator =
     }
 
     try {
-      const user = AuthService.verifyJwt(token) as IUser;
+      const user = validateToken(token);
       setCurrentUser(user);
       next();
     } catch (err) {

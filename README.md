@@ -14,3 +14,4 @@ This repository is part of the larger project:
 * **Async Queue** for limiting the amount of concurrenly processed requests
 * **Decorator-based Routes** with built-in request validation
 * **Websocket and HTTP(S)** protocols support
+* **Auto introspect endpoint** that allows to get info about all available API endpoints

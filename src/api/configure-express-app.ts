@@ -3,18 +3,20 @@ import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import { errorHandler } from './middlewares/error-handler.js';
 import compression from 'compression';
-import { createAuthenticator } from './middlewares/auth.js';
+import { createAuthenticatorMiddlware } from './middlewares/auth.js';
 import cookieParser from 'cookie-parser';
-import { ApplicationServices } from '../services/init-services.js';
 import { createRoutes } from './routes/index.js';
 import { setRequestContext } from './middlewares/set-request-context.js';
 import { IGracefulShutdownHandler } from '../utils/graceful-shutdown.js';
 import { createGracefulShutdownMiddleware } from './middlewares/graceful-shutdown.js';
 import { logMiddleware } from './middlewares/log.js';
+import { IController } from './controllers/index.js';
+import { JwtTokenValidator } from '../utils/jwt-validator.js';
 
 export function configureExpress(
   app: express.Application,
-  services: ApplicationServices,
+  controllers: IController[],
+  jwtValidator : JwtTokenValidator,
   gracefulShutdownHandler: IGracefulShutdownHandler
 ) {
   app.use(helmet());
@@ -25,7 +27,7 @@ export function configureExpress(
   app.use(cookieParser());
   app.use(logMiddleware);
   app.use(setRequestContext);
-  app.use(createAuthenticator(services));
-  createRoutes(app, services);
+  app.use(createAuthenticatorMiddlware(jwtValidator));
+  createRoutes(app, controllers);
   app.use(errorHandler); // handle sync errors
 }

@@ -1,11 +1,12 @@
-import { getControllerMethods } from '../../utils/Route.decorator.js';
+import { getControllerMetadata } from '../../utils/Route.decorator.js';
 import express from 'express';
-import { createAsyncRoute } from './create-async-route.js';
-import { checkAuth } from '../middlewares/auth.js';
+import { adaptRouteForExpress } from './adapt-route-for-express.js';
+import { checkAuth as checkAuthMiddleware } from '../middlewares/auth.js';
+import pathModule from 'node:path';
 
 // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-explicit-any
 export function createRouterFromMetadata(obj: any) {
-  const routes = getControllerMethods(obj.constructor.prototype);
+  const { prefix, routes } = getControllerMetadata(obj.constructor.prototype);
   const router = express.Router();
 
   for (const { method, path, propertyKey, params } of routes) {
@@ -15,13 +16,14 @@ export function createRouterFromMetadata(obj: any) {
       throw new Error(`${obj.constructor.name}.${propertyKey} is not a valid controller method`);
     }
 
-    const callbacks = [createAsyncRoute(fn.bind(obj))];
+    const callbacks = [adaptRouteForExpress(fn.bind(obj))];
 
     if (params?.checkAuth) {
-      callbacks.unshift(checkAuth);
+      callbacks.unshift(checkAuthMiddleware);
     }
 
-    router[method](path, createAsyncRoute(fn.bind(obj)));
+    const pathWithPrefix = pathModule.join(prefix, path);
+    router[method](pathWithPrefix, ...callbacks);
   }
 
   return router;

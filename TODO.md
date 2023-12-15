@@ -4,13 +4,13 @@
 - [ ] Remove (typeorm) DeepPartial/FindOptionsWhere usage in repo interfaces
 - [x] Rework currency handling to something better and safer
 - [ ] Add GraphQL endpoints
-- [ ] Add Websocket support
+- [x] Add Websocket support
 - [x] Define routes with Decorator
-- [ ] Cluster
+- [x] Cluster
 - [x] Logging
 - [x] Graceful shutdown
 - [x] Graceful shutdown middleware
-- [ ] HTTPS
+- [x] HTTPS
 - [x] Remove Bind decorator from Routes
 - [ ] Async Concurrent Queue
 - [ ] Rate limit

@@ -1,4 +1,13 @@
+import { AuthController } from "./api/controllers/AuthController.js";
+import { CategoryController } from "./api/controllers/CategoryController.js";
+import { SpendController } from "./api/controllers/SpendController.js";
+
 const config = Object.freeze({
+  controllers: [
+    AuthController,
+    SpendController,
+    CategoryController
+  ] ,
 
   http: {
     enabled: true,
@@ -10,6 +19,10 @@ const config = Object.freeze({
     port: 443,
     certPath: 'creds/cert.pem',
     keyPath: 'creds/key.pem'  
+  },
+
+  websocket: {
+    enabled: true,
   },
 
   // database

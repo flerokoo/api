@@ -1,11 +1,11 @@
-import { Request, Response } from 'express';
 import { ApiDependencies } from '../server.js';
 import { getCurrentUser } from '../request-context.js';
 import { CategoryService } from '../../services/CategoryService.js';
-import { success } from '../../utils/success.js';
-import { Get } from '../../utils/Route.decorator.js';
+import { Get, Prefix } from '../../utils/Route.decorator.js';
+import { IRequest } from '../../utils/Request.js';
 
-export class CategoryController {
+@Prefix('/v1/categories')
+export class CategoryController{
   service: CategoryService;
 
   constructor({ CategoryService }: ApiDependencies) {
@@ -13,9 +13,9 @@ export class CategoryController {
   }
 
   @Get('/list', { checkAuth: true })
-  async list(req: Request, res: Response) {
+  async list(request: IRequest) {
     const user = getCurrentUser();
     const categories = await this.service.listByUser(user);
-    res.json(success({ categories }));
+    request.reply({ categories });
   }
 }

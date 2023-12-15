@@ -2,26 +2,34 @@ import express, { Response } from 'express';
 import { ApplicationServices } from '../services/init-services.js';
 import { ApplicationError, HTTP_NOT_FOUND } from '../utils/errors.js';
 import https from 'node:https';
-import http, { createServer } from 'node:http';
+import http from 'node:http';
 import { IGracefulShutdownHandler } from '../utils/graceful-shutdown.js';
 import { logger } from '../utils/logger.js';
 import { configureExpress } from './configure-express-app.js';
 import config from '../config.js';
 import { readFileSync } from 'node:fs';
+import { createWebSocketServer } from './websocket/create-websocket-server.js';
+import { ControllerCtor, IController } from './controllers/index.js';
+import { JwtTokenValidator } from '../utils/jwt-validator.js';
 
 export type ApiDependencies = ApplicationServices;
 export type Protocol = 'http' | 'https';
 export type AnyServer = http.Server | https.Server;
+const httpToWs = {
+  http: 'ws',
+  https: 'wss'
+};
 
 export async function initServer(
-  services: ApplicationServices,
-  gracefulShutdownHandler: IGracefulShutdownHandler
+  controllers: IController[],
+  jwtValidator: JwtTokenValidator,
+  gsHandler: IGracefulShutdownHandler
 ) {
   const app = express();
-  configureExpress(app, services, gracefulShutdownHandler);
+  configureExpress(app, controllers, jwtValidator, gsHandler);
 
   const protocolsLaunchers = {
-    http: createHttpServer, 
+    http: createHttpServer,
     https: createHttpsServer
   };
 
@@ -30,13 +38,17 @@ export async function initServer(
   const servers: Map<Protocol, AnyServer> = protocols
     .filter((_) => config[_].enabled)
     .reduce((servers, protocol: Protocol) => {
-      const server =protocolsLaunchers[protocol](app);
-      shutdownGracefully(server, gracefulShutdownHandler)
+      const server = protocolsLaunchers[protocol](app);
+      shutdownGracefully(server, gsHandler);
       servers.set(protocol, server);
+      if (config.websocket.enabled) {
+        const wss = createWebSocketServer(server, controllers, jwtValidator);
+        servers.set(httpToWs[protocol], wss);
+      }
       return servers;
     }, new Map());
 
-  const promises = Array.from(servers.keys()).map((_) =>
+  const promises = Array.from(['http', 'https'] as const).map((_) =>
     listen(getEnvPort(_) ?? config[_].port, servers.get(_)!)
   );
 
@@ -78,8 +90,8 @@ function shutdownGracefully(
 }
 
 function getEnvPort(protocol: Protocol) {
-  const envName = protocol.toUpperCase() + "_PORT";
-  const port = parseInt(process.env[envName]!)
+  const envName = protocol.toUpperCase() + '_PORT';
+  const port = parseInt(process.env[envName]!);
   return isNaN(port) ? null : port;
 }
 
